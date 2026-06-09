@@ -1,0 +1,40 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "wandering_wizardry:block/altar/outer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "wandering_wizardry:block/altar/outer",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "wandering_wizardry:block/altar/outer",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "wandering_wizardry:block/altar/outer",
+        "y": 90
+      }
+    }
+  ]
+}

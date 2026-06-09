@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wandering_wizardry:block/altar/outer"
+  }
+}

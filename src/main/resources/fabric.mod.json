@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "wandering_wizardry",
+	"version": "${version}",
+	"name": "Wandering Wizardry 2",
+	"description": "Sculk-based magic, exploration, and QoL mod for Minecraft!",
+	"authors": [
+		"Sweet Berry Collective",
+		"Octal!"
+	],
+	"contact": {
+		"homepage": "https://sweetberry.dev/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/wandering_wizardry/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "dev.sweetberry.wwizardry.WanderingWizardry"
+		],
+		"client": [
+			"dev.sweetberry.wwizardry.client.WanderingWizardryClient"
+		]
+	},
+	"mixins": [
+		"wandering_wizardry.mixins.json",
+		{
+			"config": "wandering_wizardry.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~26.1-",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

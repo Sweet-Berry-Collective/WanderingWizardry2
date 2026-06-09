@@ -1,0 +1,27 @@
+[versions]
+loom = "1.16-SNAPSHOT"
+
+yumi_licenser = "2.1.+"
+yumi-commons = "1.0.0"
+
+minecraft = "26.1.2"
+
+fabric-loader = "0.19.2"
+fabric-api = "0.150.0+26.1.2"
+
+missingno-fix = "1.0.1"
+
+[plugins]
+loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
+
+yumi_licenser = { id = "dev.yumi.gradle.licenser", version.ref = "yumi_licenser" }
+
+[libraries]
+minecraft = { group = "com.mojang", name = "minecraft", version.ref = "minecraft" }
+
+fabric-loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric-loader" }
+fabric-api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric-api" }
+
+yumi-commons-core = { module = "dev.yumi.commons:yumi-commons-core", version.ref = "yumi-commons" }
+
+missingno-fix = { module = "gay.sylv.missingno:missingno-fix", version.ref = "missingno-fix" }

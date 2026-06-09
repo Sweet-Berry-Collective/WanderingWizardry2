@@ -1,0 +1,15 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "wandering_wizardry:scroll_recipe",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "wandering_wizardry:item/scroll/written"
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "wandering_wizardry:item/scroll/blank"
+    }
+  }
+}

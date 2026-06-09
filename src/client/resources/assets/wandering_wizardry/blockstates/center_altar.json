@@ -1,0 +1,31 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "wandering_wizardry:block/altar/center"
+      }
+    },
+    {
+      "when": {
+        "scroll": true
+      },
+      "apply": [
+        {
+          "model": "wandering_wizardry:block/altar/scroll"
+        },
+        {
+          "model": "wandering_wizardry:block/altar/scroll",
+          "y": 90
+        },
+        {
+          "model": "wandering_wizardry:block/altar/scroll",
+          "y": 180
+        },
+        {
+          "model": "wandering_wizardry:block/altar/scroll",
+          "y": 270
+        }
+      ]
+    }
+  ]
+}
