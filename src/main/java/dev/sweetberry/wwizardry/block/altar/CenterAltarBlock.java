@@ -4,21 +4,21 @@ import com.mojang.serialization.MapCodec;
 import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.block.WanderingWizardryBlocks;
 import dev.sweetberry.wwizardry.block.entity.AltarBlockEntity;
-import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -115,5 +115,30 @@ public class CenterAltarBlock extends AltarBlock implements EntityBlock {
         }
 
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public void playerDestroy(@NonNull Level level, @NonNull Player player, @NonNull BlockPos pos, @NonNull BlockState state, @Nullable BlockEntity blockEntity, @NonNull ItemStack destroyedWith) {
+        super.playerDestroy(level, player, pos, state, blockEntity, destroyedWith);
+
+        WanderingWizardry.LOGGER.info("h");
+
+        if (!level.isClientSide() && blockEntity instanceof AltarBlockEntity altarBlockEntity) {
+            altarBlockEntity.dropRecipeItems();
+            altarBlockEntity.dropScrollItem();
+        }
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NonNull Level level, @NonNull BlockState blockState, @NonNull BlockEntityType<T> type) {
+        return createTickerHelper(type, WanderingWizardryBlocks.ALTAR_ENTITY.get(), ((_, _, _, entity) -> entity.tick()));
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(
+            final BlockEntityType<A> actual, final BlockEntityType<E> expected, final BlockEntityTicker<? super E> ticker
+    ) {
+        return expected == actual ? (BlockEntityTicker<A>) ticker : null;
     }
 }

@@ -11,4 +11,5 @@ public class AltarBlockEntityRenderState extends BlockEntityRenderState {
     ItemStackRenderState result = new ItemStackRenderState();
     float partialTicks = 0;
     long gameTime = 0;
+    boolean validPlacement = false;
 }

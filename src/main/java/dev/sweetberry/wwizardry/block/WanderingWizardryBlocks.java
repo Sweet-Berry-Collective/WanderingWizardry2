@@ -26,7 +26,6 @@ public class WanderingWizardryBlocks {
     public static final RegistryContext.Value<CenterAltarBlock> CENTER_ALTAR = BLOCKS.defer("center_altar", withProperties(properties -> new CenterAltarBlock(
             properties
                     .mapColor(MapColor.COLOR_BLACK)
-                    .requiresCorrectToolForDrops()
                     .strength(1.25F, 4.2F)
                     .sound(SoundType.BASALT)
     )));
@@ -34,7 +33,6 @@ public class WanderingWizardryBlocks {
     public static final RegistryContext.Value<OuterAltarBlock> OUTER_ALTAR = BLOCKS.defer("outer_altar", withProperties(properties -> new OuterAltarBlock(
             properties
                     .mapColor(MapColor.COLOR_BLACK)
-                    .requiresCorrectToolForDrops()
                     .strength(1.25F, 4.2F)
                     .sound(SoundType.BASALT)
     )));

@@ -26,15 +26,6 @@ public class WanderingWizardryComponents {
             )
     );
 
-    public static final RegistryContext.Value<DataComponentType<Integer>> GLOBAL_TINT = DATA_COMPONENT_TYPES.defer(
-            "global_tint",
-            withBuilder(builder -> builder
-                    .persistent(Codec.INT)
-                    .networkSynchronized(ByteBufCodecs.INT)
-                    .build()
-            )
-    );
-
     public static void register() {
         DATA_COMPONENT_TYPES.register();
     }

@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -75,6 +74,10 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
             ModelFeatureRenderer.CrumblingOverlay breakProgress
     ) {
         BlockEntityRenderer.super.extractRenderState(altarBlockEntity, state, partialTicks, cameraPosition, breakProgress);
+        state.validPlacement = altarBlockEntity.validPlacement();
+
+        if (!state.validPlacement)
+            return;
 
         var level = altarBlockEntity.getLevel();
 
@@ -100,6 +103,9 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
             @NonNull SubmitNodeCollector submitNodeCollector,
             @NonNull CameraRenderState camera
     ) {
+        if (!state.validPlacement)
+            return;
+
         float full_rotation = Mth.TWO_PI * (((state.gameTime % FULL_ROTATION_TICKS) + state.partialTicks) / (float) FULL_ROTATION_TICKS);
         float local_rotation = Mth.TWO_PI * (((state.gameTime % LOCAL_ROTATION_TICKS) + state.partialTicks) / (float) LOCAL_ROTATION_TICKS);
         float bob_time = Mth.TWO_PI * (((state.gameTime % BOB_TICKS) + state.partialTicks) / (float) BOB_TICKS);

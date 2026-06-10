@@ -3,6 +3,9 @@ package dev.sweetberry.wwizardry.item;
 import dev.sweetberry.wwizardry.data.WanderingWizardryComponents;
 import dev.sweetberry.wwizardry.data.scroll.DirectScrollRecipe;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +38,8 @@ public class ScrollItem extends Item {
                 List.of(
                         Ingredient.of(Items.GRASS_BLOCK, Items.DIRT, Items.DIAMOND),
                         Ingredient.of(Items.ACACIA_BUTTON, Items.SHIELD, Items.COMPASS),
-                        Ingredient.of(Items.END_PORTAL_FRAME, Items.BEACON, Items.BUNDLE)
+                        Ingredient.of(Items.END_PORTAL_FRAME, Items.BEACON, Items.BUNDLE),
+                        Ingredient.of(level.holderLookup(Registries.ITEM).getOrThrow(ItemTags.PLANKS))
                 ),
                 Items.DIAMOND.getDefaultInstance()
         ));

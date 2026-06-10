@@ -4,14 +4,17 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.PairCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.block.WanderingWizardryBlocks;
 import dev.sweetberry.wwizardry.data.WanderingWizardryComponents;
 import dev.sweetberry.wwizardry.data.scroll.ScrollRecipe;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -42,6 +47,7 @@ public class AltarBlockEntity extends BlockEntity {
     // Mojang pls fix
     private ItemStack scrollStack = ItemStack.EMPTY;
     private ArrayList<Pair<Ingredient, ItemStack>> ingredients = new ArrayList<>();
+    private boolean validPlacement = false;
 
     public AltarBlockEntity(BlockPos worldPosition, BlockState blockState) {
         super(WanderingWizardryBlocks.ALTAR_ENTITY.get(), worldPosition, blockState);
@@ -123,7 +129,7 @@ public class AltarBlockEntity extends BlockEntity {
                 .filter(i -> this.ingredients.get(i).getFirst().test(stack))
                 .findFirst();
 
-        if (first.isPresent()) {
+        if (first.isPresent() && validPlacement) {
             var index = first.getAsInt();
 
             var ingredient = this.ingredients.get(index);
@@ -188,5 +194,71 @@ public class AltarBlockEntity extends BlockEntity {
 
     public ItemStack resultStack() {
         return this.getScrollRecipe().map(it -> it.output(this.level)).orElse(ItemStack.EMPTY);
+    }
+
+    public boolean validPlacement() {
+        return validPlacement;
+    }
+
+    boolean testPlacement() {
+        Objects.requireNonNull(level);
+
+        for (var it = Direction.Plane.HORIZONTAL.stream().iterator(); it.hasNext(); ) {
+            var direction = it.next();
+
+            var relative = worldPosition.relative(direction, 2);
+
+            var state = level.getBlockState(relative);
+
+            if (!state.is(WanderingWizardryBlocks.OUTER_ALTAR.get()))
+                return false;
+
+            if (state.getValue(BlockStateProperties.HORIZONTAL_FACING) != direction)
+                return false;
+        }
+
+        return true;
+    }
+
+    public void dropScrollItem() {
+        Objects.requireNonNull(level);
+
+        var pos = worldPosition.above().getCenter();
+        level.addFreshEntity(new ItemEntity(level, pos.x, pos.y, pos.z, this.scrollStack));
+        this.scrollStack = ItemStack.EMPTY;
+
+        setChanged();
+    }
+
+    public void dropRecipeItems() {
+        Objects.requireNonNull(level);
+
+        var pos = worldPosition.above().getCenter();
+
+        for (Pair<Ingredient, ItemStack> ingredient : ingredients) {
+            var stack = ingredient.getSecond();
+
+            if (stack.isEmpty())
+                continue;
+
+            stack = stack.copyAndClear();
+
+            if (!level.isClientSide())
+                level.addFreshEntity(new ItemEntity(level, pos.x, pos.y, pos.z, stack));
+        }
+
+        setChanged();
+    }
+
+    public void tick() {
+        Objects.requireNonNull(level);
+
+        var isValid = testPlacement();
+
+        if (!isValid && validPlacement) {
+            dropRecipeItems();
+        }
+
+        validPlacement = isValid;
     }
 }
