@@ -2,9 +2,9 @@ package dev.sweetberry.wwizardry.client.block.entity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
+import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.block.entity.AltarBlockEntity;
 import dev.sweetberry.wwizardry.client.duck.Duck_SubmitNode;
-import net.minecraft.client.model.object.equipment.ShieldModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -13,6 +13,8 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -26,15 +28,19 @@ import org.jspecify.annotations.NonNull;
 import java.util.OptionalInt;
 
 public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockEntity, AltarBlockEntityRenderState> {
+    public static final Identifier TEXTURE = WanderingWizardry.createId("textures/entity/altar.png");
+
     public static final int CYCLE_TICKS = 20;
     public static final int FULL_ROTATION_TICKS = 160;
     public static final int LOCAL_ROTATION_TICKS = 80;
     public static final int BOB_TICKS = 120;
     public static final float BOB_MAGNITUDE = 0.125f;
     private final ItemModelResolver itemModelResolver;
+    private final AltarBlockEntityModel model;
 
     public AltarBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.itemModelResolver = context.itemModelResolver();
+        this.model = new AltarBlockEntityModel(context.bakeLayer(AltarBlockEntityModel.LAYER_LOCATION));
     }
 
     @Override
@@ -80,6 +86,8 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
             tickCount = 0;
         }
 
+        itemModelResolver.updateForTopItem(state.result, altarBlockEntity.resultStack(), ItemDisplayContext.GROUND, altarBlockEntity.getLevel(), null, 0);
+
         state.ingredients = altarBlockEntity.getIngredients().stream().map(it -> mapStack(it, level, tickCount)).toList();
         state.gameTime = tickCount;
         state.partialTicks = partialTicks;
@@ -115,7 +123,7 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
             float bob_height = (float) Math.sin(randomOffset + bob_time) * BOB_MAGNITUDE;
 
             poseStack.rotateAround(new Quaternionf(new AxisAngle4f(i * radiansPerItem + full_rotation, 0, 1, 0)), 0, 0, 0);
-            poseStack.translate(1.75, bob_height, 0);
+            poseStack.translate(2, bob_height, 0);
             poseStack.rotateAround(new Quaternionf(new AxisAngle4f(local_rotation + randomOffset, 0, -1, 0)), 0, 0, 0);
 
             if (submitNodeCollector instanceof Duck_SubmitNode duck) {
@@ -132,9 +140,22 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
         }
 
         if (submitNodeCollector instanceof Duck_SubmitNode duck) {
+            duck.wandering_wizardry$setTranslucency(OptionalInt.of(0x80));
+        }
+
+        float bob_height = (float) Math.sin(bob_time) * BOB_MAGNITUDE;
+
+        poseStack.rotateAround(new Quaternionf(new AxisAngle4f(local_rotation, 0, 1, 0)), 0, 0, 0);
+        poseStack.translate(0, bob_height + 0.25, 0);
+
+        state.result.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+
+        if (submitNodeCollector instanceof Duck_SubmitNode duck) {
             duck.wandering_wizardry$setTranslucency(OptionalInt.empty());
         }
 
         poseStack.popPose();
+
+        submitNodeCollector.submitModel(model, state, poseStack, model.renderType(TEXTURE), state.lightCoords, OverlayTexture.NO_OVERLAY, 0x40FFFFFF, null, 0, null);
     }
 }

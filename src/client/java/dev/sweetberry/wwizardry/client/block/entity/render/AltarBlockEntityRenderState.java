@@ -8,6 +8,7 @@ import java.util.List;
 
 public class AltarBlockEntityRenderState extends BlockEntityRenderState {
     List<Pair<ItemStackRenderState, Boolean>> ingredients = List.of();
+    ItemStackRenderState result = new ItemStackRenderState();
     float partialTicks = 0;
     long gameTime = 0;
 }

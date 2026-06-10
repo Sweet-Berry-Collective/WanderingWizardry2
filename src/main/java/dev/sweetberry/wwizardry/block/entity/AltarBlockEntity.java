@@ -185,4 +185,8 @@ public class AltarBlockEntity extends BlockEntity {
     public Optional<ScrollRecipe> getScrollRecipe() {
         return Optional.ofNullable(this.scrollStack.get(WanderingWizardryComponents.SCROLL_RECIPE.get()));
     }
+
+    public ItemStack resultStack() {
+        return this.getScrollRecipe().map(it -> it.output(this.level)).orElse(ItemStack.EMPTY);
+    }
 }
