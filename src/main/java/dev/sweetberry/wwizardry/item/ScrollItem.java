@@ -29,7 +29,16 @@ public class ScrollItem extends Item {
             return InteractionResult.PASS;
         }
 
-        stack.set(WanderingWizardryComponents.SCROLL_RECIPE.get(), new DirectScrollRecipe(0, 0, List.of(Ingredient.of(Items.GRASS_BLOCK)), Items.DIRT.getDefaultInstance()));
+        stack.set(WanderingWizardryComponents.SCROLL_RECIPE.get(), new DirectScrollRecipe(
+                0,
+                0,
+                List.of(
+                        Ingredient.of(Items.GRASS_BLOCK, Items.DIRT, Items.DIAMOND),
+                        Ingredient.of(Items.ACACIA_BUTTON, Items.SHIELD, Items.COMPASS),
+                        Ingredient.of(Items.END_PORTAL_FRAME, Items.BEACON, Items.BUNDLE)
+                ),
+                Items.DIAMOND.getDefaultInstance()
+        ));
 
         return InteractionResult.SUCCESS;
     }

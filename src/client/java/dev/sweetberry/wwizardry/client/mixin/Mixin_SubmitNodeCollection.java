@@ -3,13 +3,23 @@ package dev.sweetberry.wwizardry.client.mixin;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.client.duck.Duck_SubmitNode;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.object.banner.BannerModel;
+import net.minecraft.client.model.object.equipment.ShieldModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.item.ItemDisplayContext;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -79,6 +89,52 @@ public class Mixin_SubmitNodeCollection implements Duck_SubmitNode {
         }).toList();
 
         original.call(poseStack, displayContext, lightCoords, overlayCoords, outlineColor, newTintLayers, newQuads, foilType);
+    }
+
+    @WrapMethod(method = "submitModel")
+    <S>void wrapModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords, int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, Operation<Void> original) {
+        if (wandering_wizardry$translucency.isEmpty()) {
+            original.call(model, state, poseStack, renderType, lightCoords, overlayCoords, tintedColor, sprite, outlineColor, crumblingOverlay);
+            return;
+        }
+
+        renderType = RenderTypes.entityTranslucent(renderType.state.textures.values().stream().findFirst().get().location());
+
+        var tint = wandering_wizardry$translucency.getAsInt() << 24;
+
+        tintedColor = tintedColor & 0xffffff | tint;
+
+        if (renderType == Sheets.cutoutItemSheet()) {
+            renderType = Sheets.translucentItemSheet();
+        }
+
+        if (renderType == Sheets.cutoutBlockItemSheet()) {
+            renderType = Sheets.translucentBlockItemSheet();
+        }
+
+        original.call(model, state, poseStack, renderType, lightCoords, overlayCoords, tintedColor, sprite, outlineColor, crumblingOverlay);
+    }
+
+    @WrapMethod(method = "submitModelPart")
+    void wrapModelPart(ModelPart modelPart, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords, TextureAtlasSprite sprite, boolean sheeted, boolean hasFoil, int tintedColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int outlineColor, Operation<Void> original) {
+        if (wandering_wizardry$translucency.isEmpty()) {
+            original.call(modelPart, poseStack, renderType, lightCoords, overlayCoords, sprite, sheeted, hasFoil, tintedColor, crumblingOverlay, outlineColor);
+            return;
+        }
+
+        var tint = wandering_wizardry$translucency.getAsInt() << 24;
+
+        tintedColor = tintedColor & 0xffffff | tint;
+
+        if (renderType == Sheets.cutoutItemSheet()) {
+            renderType = Sheets.translucentItemSheet();
+        }
+
+        if (renderType == Sheets.cutoutBlockItemSheet()) {
+            renderType = Sheets.translucentBlockItemSheet();
+        }
+
+        original.call(modelPart, poseStack, renderType, lightCoords, overlayCoords, sprite, sheeted, hasFoil, tintedColor, crumblingOverlay, outlineColor);
     }
 
     @Override
