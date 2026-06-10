@@ -19,6 +19,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
+import java.util.OptionalInt;
+
 public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockEntity, AltarBlockEntityRenderState> {
     public static final int CYCLE_TICKS = 20;
     private final ItemModelResolver itemModelResolver;
@@ -36,7 +38,7 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
         var state = new ItemStackRenderState();
 
         if (!pair.getSecond().isEmpty()) {
-            itemModelResolver.updateForTopItem(state, pair.getSecond(), ItemDisplayContext.FIXED, null, null, 0);
+            itemModelResolver.updateForTopItem(state, pair.getSecond(), ItemDisplayContext.GROUND, null, null, 0);
         } else {
             var items = pair.getFirst().items().toList();
 
@@ -44,7 +46,7 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
 
             var item = items.get(cycle).value().getDefaultInstance();
 
-            itemModelResolver.updateForTopItem(state, item, ItemDisplayContext.FIXED, level, null, 0);
+            itemModelResolver.updateForTopItem(state, item, ItemDisplayContext.GROUND, level, null, 0);
         }
 
         return Pair.of(state, !pair.getSecond().isEmpty());
@@ -78,9 +80,9 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
 
             if (submitNodeCollector instanceof Duck_SubmitNode duck) {
                 if (solid) {
-                    duck.wandering_wizardry$setTint(0xffffffff);
+                    duck.wandering_wizardry$setTranslucency(OptionalInt.empty());
                 } else {
-                    duck.wandering_wizardry$setTint(0x80ffffff);
+                    duck.wandering_wizardry$setTranslucency(OptionalInt.of(0x80));
                 }
             }
 
@@ -90,7 +92,7 @@ public class AltarBlockEntityRenderer implements BlockEntityRenderer<AltarBlockE
         }
 
         if (submitNodeCollector instanceof Duck_SubmitNode duck) {
-            duck.wandering_wizardry$setTint(0xffffffff);
+            duck.wandering_wizardry$setTranslucency(OptionalInt.empty());
         }
     }
 }

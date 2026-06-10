@@ -3,38 +3,41 @@ package dev.sweetberry.wwizardry.client.mixin;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.client.duck.Duck_SubmitNode;
-import net.minecraft.client.model.Model;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.item.ItemDisplayContext;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 @Mixin(SubmitNodeCollection.class)
 public class Mixin_SubmitNodeCollection implements Duck_SubmitNode {
     @Unique
-    int wandering_wizardry$tint = 0xffffffff;
+    OptionalInt wandering_wizardry$translucency = OptionalInt.empty();
 
     @WrapMethod(method = "submitItem")
     void wrapItem(PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers, List<BakedQuad> quads, ItemStackRenderState.FoilType foilType, Operation<Void> original) {
-        var newTintLayers = new int[tintLayers.length + 1];
-        System.arraycopy(tintLayers, 0, newTintLayers, 0, tintLayers.length);
+        if (wandering_wizardry$translucency.isEmpty()) {
+            original.call(poseStack, displayContext, lightCoords, overlayCoords, outlineColor, tintLayers, quads, foilType);
+            return;
+        }
 
-        newTintLayers[tintLayers.length] = wandering_wizardry$tint;
+        var newTintLayers = new int[tintLayers.length + 1];
+
+        var tint = wandering_wizardry$translucency.getAsInt() << 24;
+
+        for (int i = 0; i < tintLayers.length; i++) {
+            int value = tintLayers[i] & 0xffffff | tint;
+            newTintLayers[i] = value;
+        }
+
+        newTintLayers[tintLayers.length] = tint | 0xffffff;
 
         var newQuads = quads.stream().map(it -> {
             var info = it.materialInfo();
@@ -47,6 +50,11 @@ public class Mixin_SubmitNodeCollection implements Duck_SubmitNode {
 
             if (type == Sheets.cutoutBlockItemSheet()) {
                 type = Sheets.translucentBlockItemSheet();
+            }
+
+            int index = info.tintIndex();
+            if (index == -1) {
+                index = tintLayers.length;
             }
 
             return new BakedQuad(
@@ -63,7 +71,7 @@ public class Mixin_SubmitNodeCollection implements Duck_SubmitNode {
                             info.sprite(),
                             ChunkSectionLayer.TRANSLUCENT,
                             type,
-                            tintLayers.length,
+                            index,
                             info.shade(),
                             info.lightEmission()
                     )
@@ -74,7 +82,7 @@ public class Mixin_SubmitNodeCollection implements Duck_SubmitNode {
     }
 
     @Override
-    public void wandering_wizardry$setTint(int tint) {
-        wandering_wizardry$tint = tint;
+    public void wandering_wizardry$setTranslucency(OptionalInt tint) {
+        wandering_wizardry$translucency = tint;
     }
 }

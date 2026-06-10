@@ -11,13 +11,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+import java.util.OptionalInt;
+
 @Mixin(SubmitNodeStorage.class)
 public class Mixin_SubmitNodeStorage implements Duck_SubmitNode {
     @Shadow
     @Final
     private Int2ObjectAVLTreeMap<SubmitNodeCollection> submitsPerOrder;
     @Unique
-    int wandering_wizardry$tint = 0xffffffff;
+    OptionalInt wandering_wizardry$translucency = OptionalInt.empty();
 
     @WrapMethod(method = "lambda$order$0")
     SubmitNodeCollection wrapCreateNode(int ignored, Operation<SubmitNodeCollection> original) {
@@ -25,19 +27,19 @@ public class Mixin_SubmitNodeStorage implements Duck_SubmitNode {
 
         if (!(value instanceof Duck_SubmitNode duck)) return value;
 
-        duck.wandering_wizardry$setTint(wandering_wizardry$tint);
+        duck.wandering_wizardry$setTranslucency(wandering_wizardry$translucency);
 
         return value;
     }
 
     @Override
-    public void wandering_wizardry$setTint(int tint) {
-        wandering_wizardry$tint = tint;
+    public void wandering_wizardry$setTranslucency(OptionalInt tint) {
+        wandering_wizardry$translucency = tint;
 
         for (var value : this.submitsPerOrder.values()) {
             if (!(value instanceof Duck_SubmitNode duck)) continue;
 
-            duck.wandering_wizardry$setTint(wandering_wizardry$tint);
+            duck.wandering_wizardry$setTranslucency(wandering_wizardry$translucency);
         }
     }
 }

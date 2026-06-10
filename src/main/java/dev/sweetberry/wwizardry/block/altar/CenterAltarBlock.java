@@ -110,7 +110,7 @@ public class CenterAltarBlock extends AltarBlock implements EntityBlock {
             return InteractionResult.PASS;
         }
 
-        if (altarBlockEntity.tryRemoveStack(player)) {
+        if (altarBlockEntity.tryRemoveStack(player, level.isClientSide())) {
             return InteractionResult.SUCCESS;
         }
 

@@ -9,6 +9,9 @@ import dev.sweetberry.wwizardry.data.WanderingWizardryComponents;
 import dev.sweetberry.wwizardry.data.scroll.ScrollRecipe;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -18,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -41,6 +45,16 @@ public class AltarBlockEntity extends BlockEntity {
 
     public AltarBlockEntity(BlockPos worldPosition, BlockState blockState) {
         super(WanderingWizardryBlocks.ALTAR_ENTITY.get(), worldPosition, blockState);
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NonNull Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 
     @Override
@@ -124,7 +138,7 @@ public class AltarBlockEntity extends BlockEntity {
         return false;
     }
 
-    public boolean tryRemoveStack(Player player) {
+    public boolean tryRemoveStack(Player player, boolean client) {
         var first = IntStream.range(0, this.ingredients.size())
                 .filter(i -> !this.ingredients.get(i).getSecond().isEmpty())
                 .findFirst();
@@ -148,8 +162,8 @@ public class AltarBlockEntity extends BlockEntity {
         }
 
         if (!this.scrollStack.isEmpty()) {
-            if (!player.addItem(this.scrollStack)) {
-                return false;
+            if (client || !player.addItem(this.scrollStack)) {
+                return true;
             }
 
             this.scrollStack = ItemStack.EMPTY;
