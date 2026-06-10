@@ -1,5 +1,6 @@
 package dev.sweetberry.wwizardry.data;
 
+import com.mojang.serialization.Codec;
 import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.data.scroll.ScrollRecipe;
 import dev.sweetberry.wwizardry.registry.RegistryContext;
@@ -21,6 +22,15 @@ public class WanderingWizardryComponents {
             withBuilder(builder -> builder
                     .persistent(ScrollRecipe.CODEC)
                     .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(ScrollRecipe.CODEC))
+                    .build()
+            )
+    );
+
+    public static final RegistryContext.Value<DataComponentType<Integer>> GLOBAL_TINT = DATA_COMPONENT_TYPES.defer(
+            "global_tint",
+            withBuilder(builder -> builder
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.INT)
                     .build()
             )
     );

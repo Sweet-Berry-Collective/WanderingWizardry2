@@ -33,7 +33,11 @@ public class WanderingWizardry implements ModInitializer {
 		WanderingWizardryComponents.register();
 	}
 
+	public static Identifier createId(String path) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+	}
+
 	public static <T> ResourceKey<T> createKey(ResourceKey<Registry<T>> registry, String path) {
-		return ResourceKey.create(registry, Identifier.fromNamespaceAndPath(MOD_ID, path));
+		return ResourceKey.create(registry, createId(path));
 	}
 }

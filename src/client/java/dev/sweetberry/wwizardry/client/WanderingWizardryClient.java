@@ -6,9 +6,11 @@
 
 package dev.sweetberry.wwizardry.client;
 
+import dev.sweetberry.wwizardry.WanderingWizardry;
 import dev.sweetberry.wwizardry.block.WanderingWizardryBlocks;
 import dev.sweetberry.wwizardry.client.block.entity.render.AltarBlockEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.color.item.ItemTintSources;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 public class WanderingWizardryClient implements ClientModInitializer {

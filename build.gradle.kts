@@ -25,6 +25,8 @@ repositories {
 loom {
 	splitEnvironmentSourceSets()
 
+	accessWidenerPath.set(file("src/main/resources/wandering_wizardry.accesswidener"))
+
 	mods {
 		register("wandering_wizardry") {
 			sourceSet(sourceSets.main.get())
